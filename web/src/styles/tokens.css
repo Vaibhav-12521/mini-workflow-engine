@@ -1,0 +1,73 @@
+/* FullStack Assignment — shared design tokens v1.0 (2026-11-06)
+   Use these as the starting point. Extend per assignment; do not hard-code values in components. */
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #eef3f7;
+  --color-border: #d5dee6;
+  --color-text: #14263f;
+  --color-text-muted: #5b6b7d;
+  --color-primary: #0e9384;
+  --color-primary-contrast: #ffffff;
+  --color-navy: #14263f;
+  --color-success: #1a7f4b;
+  --color-warning: #b26a00;
+  --color-danger: #b42318;
+  --color-focus: #1d6fe0;
+
+  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --text-xs: 12px; --text-sm: 14px; --text-md: 16px; --text-lg: 20px; --text-xl: 28px;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+  --shadow-1: 0 1px 2px rgba(20, 38, 63, 0.12);
+  --motion-fast: 120ms; --motion-base: 200ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0e1726;
+    --color-surface: #16233a;
+    --color-border: #2a3a55;
+    --color-text: #e8eef6;
+    --color-text-muted: #9fb0c4;
+    --color-primary: #2dc4b2;
+    --color-primary-contrast: #06231f;
+    --color-success: #4cc38a;
+    --color-warning: #f0b35a;
+    --color-danger: #ff7b72;
+    --color-focus: #6aa8ff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-base: 0ms; }
+}
+
+/* ---- Extensions for Assignment 03 (documented in docs/design-system.md) ---- */
+:root {
+  --color-info: #1d5fbf;
+  --color-danger-contrast: #ffffff;
+  --color-neutral: #5b6b7d;
+  --chip-neutral-bg: #eef1f4;
+  --chip-info-bg: #e6effb;
+  --chip-success-bg: #e5f4ec;
+  --chip-warning-bg: #fbf0dd;
+  --chip-danger-bg: #fbe9e7;
+  --color-row-hover: #f5f8fa;
+  --shadow-2: 0 8px 28px rgba(20, 38, 63, 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-info: #7fb2ff;
+    --color-danger-contrast: #2a0a08;
+    --color-neutral: #a9b8ca;
+    --chip-neutral-bg: #22314a;
+    --chip-info-bg: #1b2e4f;
+    --chip-success-bg: #163a2b;
+    --chip-warning-bg: #3d2f15;
+    --chip-danger-bg: #43201e;
+    --color-row-hover: #1b2a43;
+    --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.5);
+  }
+}
