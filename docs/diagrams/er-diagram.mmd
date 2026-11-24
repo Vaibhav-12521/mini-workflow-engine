@@ -1,0 +1,35 @@
+erDiagram
+  task_statuses ||--o{ tasks : "status"
+  task_priorities ||--o{ tasks : "priority"
+  tasks ||--o{ task_activities : "has history"
+  task_statuses {
+    text code PK
+    text label
+    smallint position
+  }
+  task_priorities {
+    text code PK
+    text label
+    smallint rank
+  }
+  tasks {
+    uuid id PK
+    text title
+    text description
+    text priority FK
+    text status FK
+    int version
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at "null = live"
+  }
+  task_activities {
+    uuid id PK
+    uuid task_id FK
+    text action
+    text field "null for created/deleted"
+    text old_value
+    text new_value
+    text actor_id "optional"
+    timestamptz created_at
+  }

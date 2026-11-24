@@ -1,0 +1,9 @@
+sequenceDiagram
+  participant UI as Browser
+  participant R as Routes
+  participant DB as PostgreSQL
+  UI->>R: GET /api/tasks?status=todo&q=bug&page=2&sort=priority
+  R->>R: listTasksQuerySchema (enum filters, pageSize ≤ 50, sort whitelist)
+  R->>DB: SELECT count(*) … WHERE deleted_at IS NULL AND status=$1 AND (title ILIKE $2 OR description ILIKE $2)
+  R->>DB: SELECT … JOIN lookups ORDER BY p.rank, id LIMIT $3 OFFSET $4
+  R-->>UI: { data, pagination: {page, pageSize, total, totalPages} }

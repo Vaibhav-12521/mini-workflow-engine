@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant UI as Browser
+  participant R as Routes
+  participant S as Task Service
+  participant DB as PostgreSQL
+  UI->>UI: taskFormSchema.safeParse (inline errors)
+  UI->>R: POST /api/tasks {title, description, priority}
+  R->>R: createTaskSchema (strict) → 422 on failure
+  R->>S: create(input)
+  S->>DB: BEGIN; INSERT tasks (status = DEFAULT_STATUS)
+  S->>DB: INSERT task_activities ('created')
+  S->>DB: COMMIT (either insert fails → ROLLBACK, nothing saved)
+  S-->>UI: 201 task
+  UI->>UI: navigate to detail + "Task created" banner

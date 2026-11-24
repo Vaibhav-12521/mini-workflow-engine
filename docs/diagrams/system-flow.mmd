@@ -1,0 +1,10 @@
+flowchart LR
+  B[Browser - React SPA] -- "HTTP /api JSON (Vite proxy in dev)" --> R[Routes - Express]
+  R -- "validated input (zod)" --> S[Task Service]
+  S -- "tx: Queryable" --> TR[Task Repository]
+  S -- "tx: Queryable" --> AR[Activity Repository]
+  TR -- "parameterised SQL" --> DB[(PostgreSQL - PGlite or server)]
+  AR -- "parameterised SQL" --> DB
+  SH[Shared definition - domain.ts + schemas.ts] -. "enums, schemas, types" .-> B
+  SH -. "enums, schemas, types" .-> R
+  SH -. "lookup rows (migrate)" .-> DB
