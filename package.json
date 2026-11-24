@@ -1,0 +1,21 @@
+{
+  "name": "mini-workflow-engine",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Mini workflow app: tasks, statuses and a transactional activity history",
+  "workspaces": ["shared", "server", "web"],
+  "scripts": {
+    "db:migrate": "npm run migrate -w server",
+    "db:seed": "npm run seed -w server",
+    "db:reset": "npm run reset -w server",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w web\"",
+    "test": "npm test -w server",
+    "typecheck": "tsc -p shared && tsc -p server && tsc -p web",
+    "build": "npm run build -w web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "~5.9.3"
+  },
+  "engines": { "node": ">=20" }
+}
