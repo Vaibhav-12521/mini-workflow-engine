@@ -15,12 +15,7 @@ export function TaskCreatePage() {
         <span aria-hidden="true">/</span>
         <span aria-current="page" className="crumbs__current">New task</span>
       </nav>
-      <header className="page-header page-header--compact">
-        <div>
-          <p className="eyebrow">Create</p>
-          <h1 className="display">New task</h1>
-        </div>
-      </header>
+      <h1>New task</h1>
       <TaskForm
         mode="create"
         onCancel={() => navigate('/')}
@@ -54,12 +49,7 @@ export function TaskEditPage() {
         <span aria-hidden="true">/</span>
         <span aria-current="page" className="crumbs__current">Edit</span>
       </nav>
-      <header className="page-header page-header--compact">
-        <div>
-          <p className="eyebrow">Edit · v{task.version}</p>
-          <h1 className="display">Edit task</h1>
-        </div>
-      </header>
+      <h1>Edit task</h1>
       <TaskForm
         key={task.version}
         mode="edit"

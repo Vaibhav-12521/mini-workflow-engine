@@ -8,9 +8,9 @@ export function NotFoundPage({ what = 'task' }: { what?: string }) {
         404
       </p>
       <h1>We couldn’t find that {what}</h1>
-      <p className="muted">It may have been deleted, or the link is wrong. Its history is kept, but it no longer appears in the workflow.</p>
+      <p className="muted">It may have been deleted, or the link is wrong.</p>
       <Link to="/" className="btn btn--primary">
-        ‹ Back to task list
+        Back to tasks
       </Link>
     </div>
   );

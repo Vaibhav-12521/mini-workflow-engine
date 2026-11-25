@@ -25,7 +25,7 @@ export function StatusTrack({
           <button
             key={s.value}
             type="button"
-            className={`track__stop track__stop--${state} tone-${s.tone}`}
+            className={`track__stop track__stop--${state}`}
             aria-pressed={i === current}
             disabled={disabled}
             onClick={() => i !== current && onSelect(s.value)}
@@ -34,9 +34,6 @@ export function StatusTrack({
               {s.icon}
             </span>
             <span className="track__label">{s.label}</span>
-            <span className="track__step" aria-hidden="true">
-              Step {i + 1}
-            </span>
           </button>
         );
       })}

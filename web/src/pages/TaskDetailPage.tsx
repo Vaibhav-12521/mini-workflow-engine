@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { STATUSES, statusMeta, type Task, type TaskStatus } from '@mwe/shared';
+import { statusMeta, type Task, type TaskStatus } from '@mwe/shared';
 import { ApiError, tasksApi } from '../api/client';
 import { ActivityTimeline } from '../components/ActivityTimeline';
 import { PriorityChip, StatusChip } from '../components/Chip';
@@ -73,7 +73,6 @@ export function TaskDetailPage() {
     }
   };
 
-  const step = STATUSES.findIndex((s) => s.value === t.status) + 1;
   const events = history.state.data?.length;
 
   return (
@@ -94,18 +93,15 @@ export function TaskDetailPage() {
 
       <div className="detail-grid">
         <div className="detail-grid__main">
-          <article className={`card detail tone-${statusMeta(t.status)?.tone ?? 'neutral'}`}>
+          <article className="card detail">
             <header className="detail__header">
               <div className="detail__chips">
                 <StatusChip value={t.status} />
                 <PriorityChip value={t.priority} />
-                <span className="detail__id" title={t.id}>
-                  #{t.id.slice(-6)}
-                </span>
               </div>
               <div className="detail__actions">
                 <Link className="btn btn--secondary" to={`/tasks/${t.id}/edit`}>
-                  <span aria-hidden="true">✎</span> Edit
+                  Edit
                 </Link>
                 <Button variant="danger" onClick={() => setConfirmOpen(true)}>
                   Delete
@@ -113,7 +109,7 @@ export function TaskDetailPage() {
               </div>
             </header>
 
-            <h1 className="detail__title display">{t.title}</h1>
+            <h1 className="detail__title">{t.title}</h1>
             <p className={`detail__desc ${t.description ? '' : 'muted'}`}>{t.description || 'No description.'}</p>
 
             <dl className="detail__meta">
@@ -131,27 +127,19 @@ export function TaskDetailPage() {
               </div>
               <div>
                 <dt>Version</dt>
-                <dd className="mono">v{t.version}</dd>
-              </div>
-              <div>
-                <dt>Workflow step</dt>
-                <dd>
-                  {step} of {STATUSES.length}
-                </dd>
+                <dd>{t.version}</dd>
               </div>
             </dl>
           </article>
 
           <section className="card status-panel" aria-labelledby="status-heading">
             <header className="status-panel__head">
-              <h2 id="status-heading">Move through the workflow</h2>
+              <h2 id="status-heading">Status</h2>
               {statusSaving ? (
                 <span className="status-panel__saving" role="status">
                   <span className="spinner" aria-hidden="true" /> Saving…
                 </span>
-              ) : (
-                <span className="muted status-panel__hint">Pick a status · every change is logged</span>
-              )}
+              ) : null}
             </header>
             <StatusTrack value={t.status} disabled={statusSaving} onSelect={changeStatus} />
             {statusMsg && (
@@ -170,13 +158,8 @@ export function TaskDetailPage() {
         <section className="card activity" aria-labelledby="activity-heading">
           <header className="activity__head">
             <h2 id="activity-heading">Activity</h2>
-            {events !== undefined && (
-              <span className="count-pill">
-                {events} {events === 1 ? 'event' : 'events'}
-              </span>
-            )}
+            {events !== undefined && <span className="muted activity__count">{events}</span>}
           </header>
-          <p className="activity__note muted">Every change is saved together with its history entry.</p>
           {history.state.status === 'error' ? (
             <ErrorState error={history.state.error} onRetry={history.reload} />
           ) : !history.state.data ? (

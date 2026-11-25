@@ -16,8 +16,8 @@
   --color-danger: #b42318;
   --color-focus: #1d6fe0;
 
-  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "IBM Plex Sans", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --text-xs: 12px; --text-sm: 14px; --text-md: 16px; --text-lg: 20px; --text-xl: 28px;
 
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
@@ -33,10 +33,6 @@
 /* ---- Extensions for Assignment 03 (documented in docs/design-system.md) ---- */
 :root {
   color-scheme: light;
-  --font-display: "Bricolage Grotesque", var(--font-sans);
-  --text-2xl: 40px;
-  --space-5: 20px; --space-10: 40px; --space-12: 48px;
-  --radius-xl: 20px;
 
   --color-info: #1d5fbf;
   --color-danger-contrast: #ffffff;
@@ -47,10 +43,7 @@
   --chip-warning-bg: #fbf0dd;
   --chip-danger-bg: #fbe9e7;
   --color-row-hover: #f5f8fa;
-  --color-primary-soft: #e3f4f1;
-  --color-grid-dot: #d3dde6;
   --shadow-2: 0 8px 28px rgba(20, 38, 63, 0.18);
-  --shadow-card: 0 1px 0 rgba(20, 38, 63, 0.04), 0 12px 32px -18px rgba(20, 38, 63, 0.28);
   --backdrop: rgba(10, 20, 35, 0.55);
 
   /* Sidebar: the navy + teal pairing of the shared palette */
@@ -86,11 +79,8 @@
     --chip-warning-bg: #372a12;
     --chip-danger-bg: #3d1d1b;
     --color-row-hover: #132037;
-    --color-primary-soft: #0f2e2d;
-    --color-grid-dot: #17253a;
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.3), 0 16px 36px -20px rgba(0, 0, 0, 0.8);
     --backdrop: rgba(2, 6, 12, 0.7);
     --color-rail-bg: #070d17;
     --color-rail-border: #172338;
@@ -119,11 +109,8 @@
   --chip-warning-bg: #372a12;
   --chip-danger-bg: #3d1d1b;
   --color-row-hover: #132037;
-  --color-primary-soft: #0f2e2d;
-  --color-grid-dot: #17253a;
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.3), 0 16px 36px -20px rgba(0, 0, 0, 0.8);
   --backdrop: rgba(2, 6, 12, 0.7);
   --color-rail-bg: #070d17;
   --color-rail-border: #172338;

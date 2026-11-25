@@ -64,58 +64,28 @@ export function TaskListPage() {
   return (
     <>
       <header className="page-header">
-        <div>
-          <p className="eyebrow">Workspace</p>
-          <h1 className="display">Tasks</h1>
-          <p className="page-header__sub">
-            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
-            {counts && (
-              <>
-                {' · '}
-                {counts.total} {counts.total === 1 ? 'task' : 'tasks'} in the workflow
-              </>
-            )}
-          </p>
-        </div>
-        <Link className="btn btn--primary btn--lg page-header__cta" to="/tasks/new">
-          <span aria-hidden="true">＋</span> New task
+        <h1>Tasks</h1>
+        <Link className="btn btn--primary page-header__cta" to="/tasks/new">
+          New task
         </Link>
       </header>
 
-      {/* Status overview: one tile per status from the shared definition; clicking one filters the list. */}
-      <div className="stats" role="group" aria-label="Filter by status">
-        <button
-          type="button"
-          className={`stat ${!filters.status ? 'is-active' : ''}`}
-          aria-pressed={!filters.status}
-          onClick={() => update({ status: '' })}
-        >
-          <span className="stat__label">All tasks</span>
-          <span className="stat__value">{counts ? counts.total : '–'}</span>
-          <span className="stat__meta">everything in the workflow</span>
+      {/* Status tabs come from the shared definition; a new status adds a tab. Same ?status= filter as the dropdown. */}
+      <div className="tabs" role="group" aria-label="Filter by status">
+        <button type="button" className="tabs__item" aria-pressed={!filters.status} onClick={() => update({ status: '' })}>
+          All <span className="tabs__count">{counts?.total ?? ''}</span>
         </button>
-        {STATUSES.map((s) => {
-          const n = counts?.byStatus[s.value] ?? 0;
-          const pct = counts?.total ? Math.round((n / counts.total) * 100) : 0;
-          return (
-            <button
-              key={s.value}
-              type="button"
-              className={`stat tone-${s.tone} ${filters.status === s.value ? 'is-active' : ''}`}
-              aria-pressed={filters.status === s.value}
-              onClick={() => update({ status: filters.status === s.value ? '' : s.value })}
-            >
-              <span className="stat__label">
-                <span aria-hidden="true">{s.icon}</span> {s.label}
-              </span>
-              <span className="stat__value">{counts ? n : '–'}</span>
-              <span className="stat__meta">{counts ? `${pct}% of all tasks` : ' '}</span>
-              <span className="stat__bar" aria-hidden="true">
-                <span style={{ inlineSize: `${pct}%` }} />
-              </span>
-            </button>
-          );
-        })}
+        {STATUSES.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            className="tabs__item"
+            aria-pressed={filters.status === s.value}
+            onClick={() => update({ status: filters.status === s.value ? '' : s.value })}
+          >
+            {s.label} <span className="tabs__count">{counts?.byStatus[s.value] ?? ''}</span>
+          </button>
+        ))}
       </div>
 
       {flash && (
@@ -154,13 +124,10 @@ export function TaskListPage() {
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">Task</th>
+                <th scope="col">Title</th>
                 <th scope="col">Status</th>
                 <th scope="col">Priority</th>
                 <th scope="col">Updated</th>
-                <th scope="col">
-                  <span className="sr-only">Open</span>
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -168,7 +135,7 @@ export function TaskListPage() {
                 <tr
                   key={t.id}
                   onClick={() => navigate(`/tasks/${t.id}`)}
-                  className={`table__row tone-${statusMeta(t.status)?.tone ?? 'neutral'}`}
+                  className="table__row"
                 >
                   <td>
                     <Link to={`/tasks/${t.id}`} onClick={(e) => e.stopPropagation()} className="table__title">
@@ -189,10 +156,6 @@ export function TaskListPage() {
                     <time dateTime={t.updatedAt} title={fullDate(t.updatedAt)}>
                       {timeAgo(t.updatedAt)}
                     </time>
-                    <span className="table__version">v{t.version}</span>
-                  </td>
-                  <td className="table__go" aria-hidden="true">
-                    →
                   </td>
                 </tr>
               ))}

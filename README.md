@@ -163,7 +163,7 @@ Rehearsed before submission:
 
 1. `shared/src/domain.ts`: add `{ value: 'blocked', label: 'Blocked', icon: '⊘', tone: 'danger' }` to `STATUSES`.
 2. `npm run db:migrate`: the lookup row is upserted, so the FK accepts `blocked`.
-3. Everything else follows automatically: API validation (zod enum), UI dropdowns, filter, chips, overview tiles, side-rail counts, the workflow track, timeline labels, sort order, and test T13 (DB lookup = shared definition).
+3. Everything else follows automatically: API validation (zod enum), UI dropdowns, filter, chips, status tabs, side-rail counts, the workflow track, timeline labels, sort order, and test T13 (DB lookup = shared definition).
 4. Add a test, e.g. `PATCH { status: 'blocked' }` → 200 and a `status_changed todo → blocked` activity.
 
 With the line added, `tsc` and all 27 tests passed unchanged.
