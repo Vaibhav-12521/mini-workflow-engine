@@ -14,6 +14,6 @@ App
 |---|---|---|---|---|
 | `/` | Task list | user (no auth) | `GET /api/tasks` | loading, empty, filtered-empty, error, ready |
 | `/tasks/new` | Task form (create) | user | `POST /api/tasks` | default, validation error, saving, error |
-| `/tasks/:id` | Task detail | user | `GET /api/tasks/:id`, `GET /api/tasks/:id/activities`, `PATCH`, `DELETE` | loading, ready, error, not found, status saving/saved/conflict |
+| `/tasks/:id` | Task detail | user | `GET /api/tasks/:id`, `GET /api/tasks/:id/activities`, `PATCH`, `DELETE` | loading, ready, error, not found, status saving/saved/conflict (workflow track) |
 | `/tasks/:id/edit` | Task form (edit) | user | `GET /api/tasks/:id`, `PATCH /api/tasks/:id` | loading, default, validation error, saving, conflict, not found |
 | `*` | Not found | user | — | ready |

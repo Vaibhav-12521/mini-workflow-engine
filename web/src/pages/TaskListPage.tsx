@@ -1,14 +1,16 @@
 import { useCallback } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { DEFAULT_ORDER, DEFAULT_SORT, PAGE_SIZE_DEFAULT, priorityMeta, statusMeta } from '@mwe/shared';
+import { DEFAULT_ORDER, DEFAULT_SORT, PAGE_SIZE_DEFAULT, STATUSES, priorityMeta, statusMeta } from '@mwe/shared';
 import { tasksApi } from '../api/client';
 import { PriorityChip, StatusChip } from '../components/Chip';
 import { FilterBar, type Filters } from '../components/FilterBar';
 import { Pagination } from '../components/Pagination';
+import { MiniTrack } from '../components/StatusTrack';
 import { Banner, Button, EmptyState, ErrorState, SkeletonRows } from '../components/ui';
 import { fullDate, timeAgo } from '../lib/format';
 import { useAsync } from '../lib/useAsync';
 import { useFlash } from '../lib/useFlash';
+import { usePipeline } from '../lib/pipeline';
 
 /** S-01 Task list. Filters live in the URL, so a filtered view survives refresh and can be shared. */
 export function TaskListPage() {
@@ -16,6 +18,7 @@ export function TaskListPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [flash, clearFlash] = useFlash(location);
+  const { counts } = usePipeline();
 
   const filters: Filters = {
     status: params.get('status') ?? '',
@@ -61,11 +64,59 @@ export function TaskListPage() {
   return (
     <>
       <header className="page-header">
-        <h1>Tasks</h1>
-        <Link className="btn btn--primary" to="/tasks/new">
-          + New task
+        <div>
+          <p className="eyebrow">Workspace</p>
+          <h1 className="display">Tasks</h1>
+          <p className="page-header__sub">
+            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {counts && (
+              <>
+                {' · '}
+                {counts.total} {counts.total === 1 ? 'task' : 'tasks'} in the workflow
+              </>
+            )}
+          </p>
+        </div>
+        <Link className="btn btn--primary btn--lg page-header__cta" to="/tasks/new">
+          <span aria-hidden="true">＋</span> New task
         </Link>
       </header>
+
+      {/* Status overview: one tile per status from the shared definition; clicking one filters the list. */}
+      <div className="stats" role="group" aria-label="Filter by status">
+        <button
+          type="button"
+          className={`stat ${!filters.status ? 'is-active' : ''}`}
+          aria-pressed={!filters.status}
+          onClick={() => update({ status: '' })}
+        >
+          <span className="stat__label">All tasks</span>
+          <span className="stat__value">{counts ? counts.total : '–'}</span>
+          <span className="stat__meta">everything in the workflow</span>
+        </button>
+        {STATUSES.map((s) => {
+          const n = counts?.byStatus[s.value] ?? 0;
+          const pct = counts?.total ? Math.round((n / counts.total) * 100) : 0;
+          return (
+            <button
+              key={s.value}
+              type="button"
+              className={`stat tone-${s.tone} ${filters.status === s.value ? 'is-active' : ''}`}
+              aria-pressed={filters.status === s.value}
+              onClick={() => update({ status: filters.status === s.value ? '' : s.value })}
+            >
+              <span className="stat__label">
+                <span aria-hidden="true">{s.icon}</span> {s.label}
+              </span>
+              <span className="stat__value">{counts ? n : '–'}</span>
+              <span className="stat__meta">{counts ? `${pct}% of all tasks` : ' '}</span>
+              <span className="stat__bar" aria-hidden="true">
+                <span style={{ inlineSize: `${pct}%` }} />
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {flash && (
         <Banner tone="success" onDismiss={clearFlash}>
@@ -103,15 +154,22 @@ export function TaskListPage() {
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">Title</th>
+                <th scope="col">Task</th>
                 <th scope="col">Status</th>
                 <th scope="col">Priority</th>
                 <th scope="col">Updated</th>
+                <th scope="col">
+                  <span className="sr-only">Open</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {result.data.map((t) => (
-                <tr key={t.id} onClick={() => navigate(`/tasks/${t.id}`)} className="table__row">
+                <tr
+                  key={t.id}
+                  onClick={() => navigate(`/tasks/${t.id}`)}
+                  className={`table__row tone-${statusMeta(t.status)?.tone ?? 'neutral'}`}
+                >
                   <td>
                     <Link to={`/tasks/${t.id}`} onClick={(e) => e.stopPropagation()} className="table__title">
                       {t.title}
@@ -119,7 +177,10 @@ export function TaskListPage() {
                     {t.description && <span className="table__desc">{t.description}</span>}
                   </td>
                   <td data-label="Status">
-                    <StatusChip value={t.status} />
+                    <span className="status-cell">
+                      <StatusChip value={t.status} />
+                      <MiniTrack value={t.status} />
+                    </span>
                   </td>
                   <td data-label="Priority">
                     <PriorityChip value={t.priority} />
@@ -128,6 +189,10 @@ export function TaskListPage() {
                     <time dateTime={t.updatedAt} title={fullDate(t.updatedAt)}>
                       {timeAgo(t.updatedAt)}
                     </time>
+                    <span className="table__version">v{t.version}</span>
+                  </td>
+                  <td className="table__go" aria-hidden="true">
+                    →
                   </td>
                 </tr>
               ))}

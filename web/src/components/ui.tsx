@@ -72,6 +72,11 @@ export function SkeletonRows({ rows = 5 }: { rows?: number }) {
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="state">
+      <svg className="state__art" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="10" y="14" width="44" height="38" rx="8" />
+        <path d="M20 28h24M20 36h16M20 44h10" />
+        <circle cx="48" cy="16" r="8" />
+      </svg>
       <p className="state__title">{title}</p>
       {children}
     </div>
@@ -81,6 +86,7 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 export function ErrorState({ error, onRetry }: { error: ApiError; onRetry?: () => void }) {
   return (
     <div className="state state--error" role="alert">
+      <span className="state__icon" aria-hidden="true">!</span>
       <p className="state__title">Something went wrong</p>
       <p>{error.message}</p>
       {onRetry && <Button onClick={onRetry}>Try again</Button>}

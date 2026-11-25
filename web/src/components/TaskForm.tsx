@@ -8,6 +8,8 @@ import {
   type TaskFormValues,
 } from '@mwe/shared';
 import { ApiError } from '../api/client';
+import { PriorityChip, StatusChip } from './Chip';
+import { MiniTrack } from './StatusTrack';
 import { Banner, Button, PriorityOptions, StatusOptions } from './ui';
 
 interface TaskFormProps {
@@ -80,6 +82,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
     );
 
   return (
+    <div className="form-layout">
     <form className="card form" onSubmit={handleSubmit} noValidate>
       {formError && (
         <Banner tone="error">
@@ -107,7 +110,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
         <label htmlFor="field-description">Description</label>
         <textarea
           {...fieldProps('description')}
-          rows={5}
+          rows={7}
           value={values.description}
           onChange={(e) => set('description', e.target.value)}
         />
@@ -147,5 +150,34 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
         </Button>
       </div>
     </form>
+
+    {/* Live preview: how the task will read in the list, from the same values the form submits. */}
+    <aside className="form-aside" aria-label="Preview">
+      <div className="card preview">
+        <p className="eyebrow">Live preview</p>
+        <div className="preview__row">
+          <p className={`preview__title ${values.title.trim() ? '' : 'muted'}`}>{values.title.trim() || 'Untitled task'}</p>
+          <p className="preview__desc muted">{values.description.trim() || 'No description yet.'}</p>
+          <div className="preview__chips">
+            <StatusChip value={values.status} />
+            <PriorityChip value={values.priority} />
+            <MiniTrack value={values.status} />
+          </div>
+        </div>
+      </div>
+      <div className="card notes">
+        <p className="eyebrow">Good to know</p>
+        <ul>
+          {mode === 'create' ? (
+            <li>New tasks start in “To do”. Change the status from the task page.</li>
+          ) : (
+            <li>Only the fields you change are saved, each with its own history entry.</li>
+          )}
+          <li>Every change is written together with its history entry, or not at all.</li>
+          <li>If someone else saves this task first, you’ll be asked to reload instead of overwriting their work.</li>
+        </ul>
+      </div>
+    </aside>
+    </div>
   );
 }

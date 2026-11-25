@@ -11,7 +11,7 @@ export function Pagination({ page, totalPages, total, onPage }: PaginationProps)
   return (
     <nav className="pagination" aria-label="Pagination">
       <span className="muted">
-        Page {page} of {totalPages} · {total} {total === 1 ? 'task' : 'tasks'}
+        Page <strong className="pagination__num">{page}</strong> of {totalPages} · {total} {total === 1 ? 'task' : 'tasks'}
       </span>
       <div className="pagination__buttons">
         <Button onClick={() => onPage(page - 1)} disabled={page <= 1}>

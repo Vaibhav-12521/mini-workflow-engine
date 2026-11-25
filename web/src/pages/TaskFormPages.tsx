@@ -10,10 +10,17 @@ export function TaskCreatePage() {
   const navigate = useNavigate();
   return (
     <>
-      <Link to="/" className="back-link">
-        ‹ Back to list
-      </Link>
-      <h1>New task</h1>
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <Link to="/">Tasks</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" className="crumbs__current">New task</span>
+      </nav>
+      <header className="page-header page-header--compact">
+        <div>
+          <p className="eyebrow">Create</p>
+          <h1 className="display">New task</h1>
+        </div>
+      </header>
       <TaskForm
         mode="create"
         onCancel={() => navigate('/')}
@@ -40,10 +47,19 @@ export function TaskEditPage() {
   const task = state.data;
   return (
     <>
-      <Link to={`/tasks/${task.id}`} className="back-link">
-        ‹ Back to task
-      </Link>
-      <h1>Edit task</h1>
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <Link to="/">Tasks</Link>
+        <span aria-hidden="true">/</span>
+        <Link to={`/tasks/${task.id}`} className="crumbs__mid">{task.title}</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" className="crumbs__current">Edit</span>
+      </nav>
+      <header className="page-header page-header--compact">
+        <div>
+          <p className="eyebrow">Edit · v{task.version}</p>
+          <h1 className="display">Edit task</h1>
+        </div>
+      </header>
       <TaskForm
         key={task.version}
         mode="edit"

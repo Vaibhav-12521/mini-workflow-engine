@@ -8,6 +8,13 @@ const ACTION_LABELS: Record<Activity['action'], string> = {
   deleted: 'Deleted',
 };
 
+const ACTION_GLYPHS: Record<Activity['action'], string> = {
+  created: '+',
+  edited: '✎',
+  status_changed: '⇄',
+  deleted: '×',
+};
+
 const short = (s: string) => (s.length > 80 ? `${s.slice(0, 80)}…` : s);
 
 function describe(a: Activity) {
@@ -31,14 +38,18 @@ export function ActivityTimeline({ items }: { items: Activity[] }) {
     <ol className="timeline">
       {items.map((a) => (
         <li key={a.id} className={`timeline__item timeline__item--${a.action}`}>
-          <span className="timeline__dot" aria-hidden="true" />
+          <span className="timeline__dot" aria-hidden="true">
+            {ACTION_GLYPHS[a.action]}
+          </span>
           <div className="timeline__content">
-            <p className="timeline__action">{ACTION_LABELS[a.action]}</p>
+            <p className="timeline__head">
+              <span className="timeline__action">{ACTION_LABELS[a.action]}</span>
+              <time className="timeline__time" dateTime={a.createdAt} title={fullDate(a.createdAt)}>
+                {timeAgo(a.createdAt)}
+              </time>
+            </p>
             <p className="timeline__detail">{describe(a)}</p>
           </div>
-          <time className="timeline__time" dateTime={a.createdAt} title={fullDate(a.createdAt)}>
-            {timeAgo(a.createdAt)}
-          </time>
         </li>
       ))}
     </ol>

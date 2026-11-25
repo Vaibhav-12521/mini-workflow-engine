@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { statusMeta, type Task, type TaskStatus } from '@mwe/shared';
+import { STATUSES, statusMeta, type Task, type TaskStatus } from '@mwe/shared';
 import { ApiError, tasksApi } from '../api/client';
 import { ActivityTimeline } from '../components/ActivityTimeline';
 import { PriorityChip, StatusChip } from '../components/Chip';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Banner, Button, ErrorState, Loading, StatusOptions } from '../components/ui';
-import { fullDate } from '../lib/format';
+import { StatusTrack } from '../components/StatusTrack';
+import { Banner, Button, ErrorState, Loading } from '../components/ui';
+import { fullDate, timeAgo } from '../lib/format';
+import { usePipeline } from '../lib/pipeline';
 import { useAsync } from '../lib/useAsync';
 import { useFlash } from '../lib/useFlash';
 import { NotFoundPage } from './NotFoundPage';
@@ -17,6 +19,7 @@ export function TaskDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [flash, clearFlash] = useFlash(location);
+  const pipeline = usePipeline();
 
   const task = useAsync(() => tasksApi.get(id), [id]);
   const history = useAsync(() => tasksApi.activities(id), [id]);
@@ -41,6 +44,7 @@ export function TaskDetailPage() {
       const updated = await tasksApi.update(t.id, { status: next, version: t.version });
       task.setData(updated); // show the new status right after success
       history.reload();
+      pipeline.refresh();
       setStatusMsg({ tone: 'success', text: `Status updated to ${statusMeta(next)?.label ?? next}` });
     } catch (err) {
       const e = err instanceof ApiError ? err : null;
@@ -69,11 +73,18 @@ export function TaskDetailPage() {
     }
   };
 
+  const step = STATUSES.findIndex((s) => s.value === t.status) + 1;
+  const events = history.state.data?.length;
+
   return (
     <>
-      <Link to="/" className="back-link">
-        ‹ Back to list
-      </Link>
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <Link to="/">Tasks</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" className="crumbs__current">
+          {t.title}
+        </span>
+      </nav>
 
       {flash && (
         <Banner tone="success" onDismiss={clearFlash}>
@@ -81,71 +92,100 @@ export function TaskDetailPage() {
         </Banner>
       )}
 
-      <article className="card detail">
-        <header className="detail__header">
-          <h1 className="detail__title">{t.title}</h1>
-          <div className="detail__actions">
-            <Link className="btn btn--secondary" to={`/tasks/${t.id}/edit`}>
-              Edit
-            </Link>
-            <Button variant="danger" onClick={() => setConfirmOpen(true)}>
-              Delete
-            </Button>
-          </div>
-        </header>
+      <div className="detail-grid">
+        <div className="detail-grid__main">
+          <article className={`card detail tone-${statusMeta(t.status)?.tone ?? 'neutral'}`}>
+            <header className="detail__header">
+              <div className="detail__chips">
+                <StatusChip value={t.status} />
+                <PriorityChip value={t.priority} />
+                <span className="detail__id" title={t.id}>
+                  #{t.id.slice(-6)}
+                </span>
+              </div>
+              <div className="detail__actions">
+                <Link className="btn btn--secondary" to={`/tasks/${t.id}/edit`}>
+                  <span aria-hidden="true">✎</span> Edit
+                </Link>
+                <Button variant="danger" onClick={() => setConfirmOpen(true)}>
+                  Delete
+                </Button>
+              </div>
+            </header>
 
-        <div className="detail__chips">
-          <StatusChip value={t.status} />
-          <PriorityChip value={t.priority} />
-        </div>
+            <h1 className="detail__title display">{t.title}</h1>
+            <p className={`detail__desc ${t.description ? '' : 'muted'}`}>{t.description || 'No description.'}</p>
 
-        <p className={`detail__desc ${t.description ? '' : 'muted'}`}>{t.description || 'No description.'}</p>
+            <dl className="detail__meta">
+              <div>
+                <dt>Created</dt>
+                <dd>{fullDate(t.createdAt)}</dd>
+              </div>
+              <div>
+                <dt>Last updated</dt>
+                <dd>
+                  <time dateTime={t.updatedAt} title={fullDate(t.updatedAt)}>
+                    {timeAgo(t.updatedAt)}
+                  </time>
+                </dd>
+              </div>
+              <div>
+                <dt>Version</dt>
+                <dd className="mono">v{t.version}</dd>
+              </div>
+              <div>
+                <dt>Workflow step</dt>
+                <dd>
+                  {step} of {STATUSES.length}
+                </dd>
+              </div>
+            </dl>
+          </article>
 
-        <dl className="detail__meta">
-          <div>
-            <dt>Created</dt>
-            <dd>{fullDate(t.createdAt)}</dd>
-          </div>
-          <div>
-            <dt>Updated</dt>
-            <dd>{fullDate(t.updatedAt)}</dd>
-          </div>
-        </dl>
-
-        <div className="status-control">
-          <label htmlFor="status-select">Change status</label>
-          <select
-            id="status-select"
-            value={t.status}
-            disabled={statusSaving}
-            onChange={(e) => changeStatus(e.target.value as TaskStatus)}
-          >
-            <StatusOptions />
-          </select>
-          {statusSaving && <span className="spinner" role="status" aria-label="Saving status" />}
-        </div>
-        {statusMsg && (
-          <Banner tone={statusMsg.tone} onDismiss={() => setStatusMsg(null)}>
-            {statusMsg.text}{' '}
-            {statusMsg.conflict && (
-              <Button variant="ghost" onClick={() => { task.reload(); history.reload(); setStatusMsg(null); }}>
-                Reload
-              </Button>
+          <section className="card status-panel" aria-labelledby="status-heading">
+            <header className="status-panel__head">
+              <h2 id="status-heading">Move through the workflow</h2>
+              {statusSaving ? (
+                <span className="status-panel__saving" role="status">
+                  <span className="spinner" aria-hidden="true" /> Saving…
+                </span>
+              ) : (
+                <span className="muted status-panel__hint">Pick a status · every change is logged</span>
+              )}
+            </header>
+            <StatusTrack value={t.status} disabled={statusSaving} onSelect={changeStatus} />
+            {statusMsg && (
+              <Banner tone={statusMsg.tone} onDismiss={() => setStatusMsg(null)}>
+                {statusMsg.text}{' '}
+                {statusMsg.conflict && (
+                  <Button variant="ghost" onClick={() => { task.reload(); history.reload(); setStatusMsg(null); }}>
+                    Reload
+                  </Button>
+                )}
+              </Banner>
             )}
-          </Banner>
-        )}
-      </article>
+          </section>
+        </div>
 
-      <section className="card" aria-labelledby="activity-heading">
-        <h2 id="activity-heading">Activity</h2>
-        {history.state.status === 'error' ? (
-          <ErrorState error={history.state.error} onRetry={history.reload} />
-        ) : !history.state.data ? (
-          <Loading label="Loading history…" />
-        ) : (
-          <ActivityTimeline items={history.state.data} />
-        )}
-      </section>
+        <section className="card activity" aria-labelledby="activity-heading">
+          <header className="activity__head">
+            <h2 id="activity-heading">Activity</h2>
+            {events !== undefined && (
+              <span className="count-pill">
+                {events} {events === 1 ? 'event' : 'events'}
+              </span>
+            )}
+          </header>
+          <p className="activity__note muted">Every change is saved together with its history entry.</p>
+          {history.state.status === 'error' ? (
+            <ErrorState error={history.state.error} onRetry={history.reload} />
+          ) : !history.state.data ? (
+            <Loading label="Loading history…" />
+          ) : (
+            <ActivityTimeline items={history.state.data} />
+          )}
+        </section>
+      </div>
 
       <ConfirmDialog
         open={confirmOpen}
