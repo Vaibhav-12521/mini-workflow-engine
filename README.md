@@ -4,8 +4,6 @@ A small task app. You create tasks, move them through statuses, and every change
 A task change and its history rows are written in one database transaction, so a change can never be saved without its history.
 Assignment 03 of the Anshumat / OnRole full-stack screen. TypeScript end to end, PostgreSQL SQL, React UI.
 
-![Task list](docs/demo/01-task-list.png)
-
 - Repository: https://github.com/Vaibhav-12521/mini-workflow-engine
 - Demo video: see [docs/demo/README.md](docs/demo/README.md)
 - Screenshots of every screen (light, dark, tablet, mobile): [docs/demo/](docs/demo/README.md)
