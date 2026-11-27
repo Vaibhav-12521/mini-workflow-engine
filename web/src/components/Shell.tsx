@@ -42,7 +42,6 @@ function ThemeSwitch({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** Desktop side rail: navigation, the live workflow pipeline (counts per status) and the theme switch. */
 export function Sidebar() {
   const { counts } = usePipeline();
   const [params] = useSearchParams();
@@ -95,7 +94,6 @@ export function Sidebar() {
   );
 }
 
-/** Compact header for tablet and phone widths, where the side rail is hidden. */
 export function TopBar() {
   return (
     <header className="topbar">

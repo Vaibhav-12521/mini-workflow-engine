@@ -4,7 +4,6 @@ import { AppError } from './http/errors';
 import { tasksRouter } from './routes/tasks';
 import { createTaskService } from './services/taskService';
 
-/** Builds the Express app around a database. Tests pass an in-memory database. */
 export function createApp(db: Database) {
   const app = express();
   app.disable('x-powered-by');
@@ -17,7 +16,6 @@ export function createApp(db: Database) {
 
   app.use('/api', (_req, _res, next) => next(new AppError(404, 'NOT_FOUND', 'Route not found')));
 
-  // One place turns every error into the standard error body. Raw DB errors never reach the client.
   const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     if (err instanceof AppError) {
       res.status(err.status).json(err.toBody());

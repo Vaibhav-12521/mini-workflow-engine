@@ -3,7 +3,6 @@ import { createApp } from '../src/app';
 import { createDatabase, type Database } from '../src/db/client';
 import { migrate } from '../src/db/migrate';
 
-/** Fresh in-memory PostgreSQL (PGlite) with the real schema applied. No external setup. */
 export async function setupTestApp() {
   const db = await createDatabase();
   await migrate(db);

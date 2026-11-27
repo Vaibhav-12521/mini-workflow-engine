@@ -4,11 +4,9 @@ interface ChipProps {
   icon: string;
   label: string;
   tone: ChipTone;
-  /** Screen-reader prefix, e.g. "Status". */
   kind: string;
 }
 
-/** A chip always carries an icon AND text, never colour alone (accessibility rule). */
 function Chip({ icon, label, tone, kind }: ChipProps) {
   return (
     <span className={`chip chip--${tone}`}>
@@ -19,7 +17,6 @@ function Chip({ icon, label, tone, kind }: ChipProps) {
   );
 }
 
-// Labels, icons and tones come from the shared definition, so a new status needs no change here.
 export function StatusChip({ value }: { value: string }) {
   const m = statusMeta(value);
   return <Chip kind="Status" icon={m?.icon ?? '?'} label={m?.label ?? value} tone={m?.tone ?? 'neutral'} />;

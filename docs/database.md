@@ -1,4 +1,4 @@
-# Database — Mini Workflow Engine
+# Database
 
 Source of truth: [`db/schema.sql`](../db/schema.sql) (idempotent, `npm run db:migrate`) and [`db/seed.sql`](../db/seed.sql) (synthetic, idempotent).
 Engine: PostgreSQL (embedded PGlite by default, or any PostgreSQL 15+ via `DATABASE_URL`).
@@ -40,6 +40,7 @@ erDiagram
     text new_value
     text actor_id "optional"
     timestamptz created_at
+    bigint seq "insert order"
   }
 ```
 
@@ -49,8 +50,8 @@ erDiagram
 
 | Table | Purpose | PK | Key FKs |
 |---|---|---|---|
-| `task_statuses` | Allowed statuses, synced from `shared/src/domain.ts` | `code` | — |
-| `task_priorities` | Allowed priorities, synced from `shared/src/domain.ts` | `code` | — |
+| `task_statuses` | Allowed statuses, synced from `shared/src/domain.ts` | `code` | - |
+| `task_priorities` | Allowed priorities, synced from `shared/src/domain.ts` | `code` | - |
 | `tasks` | The tasks | `id` | `status → task_statuses.code`, `priority → task_priorities.code` |
 | `task_activities` | Append-only change history | `id` | `task_id → tasks.id` |
 
@@ -61,10 +62,10 @@ erDiagram
 | Column | Type | Null | Default | Constraint | Notes |
 |---|---|---|---|---|---|
 | id | uuid | no | `gen_random_uuid()` | PK | Not guessable, safe in URLs |
-| title | text | no | — | `CHECK 1..200 chars after trim` | Mirrors zod rule |
+| title | text | no | - | `CHECK 1..200 chars after trim` | Mirrors zod rule |
 | description | text | no | `''` | `CHECK ≤ 5000 chars` | Empty string instead of NULL: one "no description" value |
-| priority | text | no | — | FK → `task_priorities` | |
-| status | text | no | — | FK → `task_statuses` | Default `todo` is applied by the service (from the shared definition) |
+| priority | text | no | - | FK → `task_priorities` | |
+| status | text | no | - | FK → `task_statuses` | Default `todo` is applied by the service (from the shared definition) |
 | version | integer | no | `1` | `CHECK ≥ 1` | Optimistic-lock token, +1 on every update |
 | created_at | timestamptz | no | `now()` | `CHECK updated_at ≥ created_at` | Immutable after insert |
 | updated_at | timestamptz | no | `now()` | | Set to `clock_timestamp()` on update |
@@ -75,12 +76,13 @@ erDiagram
 | Column | Type | Null | Default | Constraint | Notes |
 |---|---|---|---|---|---|
 | id | uuid | no | `gen_random_uuid()` | PK | |
-| task_id | uuid | no | — | FK → `tasks.id` ON DELETE CASCADE | Cascade only matters for a hard purge; the app soft-deletes |
-| action | text | no | — | `CHECK IN (created, edited, status_changed, deleted)` | |
+| task_id | uuid | no | - | FK → `tasks.id` ON DELETE CASCADE | Cascade only matters for a hard purge; the app soft-deletes |
+| action | text | no | - | `CHECK IN (created, edited, status_changed, deleted)` | |
 | field | text | yes | NULL | `CHECK IN (title, description, priority, status)`; required when action is edited/status_changed | One row per changed field |
 | old_value / new_value | text | yes | NULL | | Stored as text: statuses/priorities as codes, labels resolved in UI |
 | actor_id | text | yes | NULL | | Optional per brief; NULL because there is no auth |
-| created_at | timestamptz | no | `clock_timestamp()` | | `clock_timestamp()` (not `now()`), so rows written in one transaction stay distinct and ordered |
+| created_at | timestamptz | no | `clock_timestamp()` | | `clock_timestamp()` (not `now()`), so later writes get later times |
+| seq | bigint | no | identity | | Insert order. Breaks ties when two rows from one edit get the same timestamp, so "title" is always listed before "priority" |
 
 All rows in `task_activities` are **immutable**: the app only inserts, never updates or deletes them.
 
@@ -105,7 +107,7 @@ Why lookup tables instead of `CHECK (status IN (...))`: the brief requires **one
 | `idx_tasks_live_updated` | `(updated_at DESC, id) WHERE deleted_at IS NULL` | Default list: no filter, newest first, paginated | Partial index: only live rows, matching every list query's `deleted_at IS NULL` |
 | `idx_tasks_live_status_updated` | `(status, updated_at DESC) WHERE deleted_at IS NULL` | `?status=…` with default sort | Equality on status then ordered scan; also covers the status FK |
 | `idx_tasks_live_priority_updated` | `(priority, updated_at DESC) WHERE deleted_at IS NULL` | `?priority=…` with default sort | Same for priority; covers the priority FK |
-| `idx_task_activities_task_created` | `(task_id, created_at, id)` | Timeline for one task, oldest first | Matches `WHERE task_id = $1 ORDER BY created_at, id` exactly; covers the FK |
+| `idx_task_activities_task_order` | `(task_id, created_at, seq)` | Timeline for one task, oldest first | Matches `WHERE task_id = $1 ORDER BY created_at, seq` exactly; covers the FK |
 
 Not indexed on purpose: `ILIKE '%term%'` search. A B-tree can't serve a leading wildcard. At this scale the filtered sequential scan is fine. At scale, add `pg_trgm` GIN indexes on `title` and `description`.
 
@@ -113,9 +115,9 @@ Not indexed on purpose: `ILIKE '%term%'` search. A B-tree can't serve a leading 
 
 | Relationship | Type | Junction |
 |---|---|---|
-| task_statuses → tasks | 1:N | — |
-| task_priorities → tasks | 1:N | — |
-| tasks → task_activities | 1:N (≥ 1, since "created" is always written) | — |
+| task_statuses → tasks | 1:N | - |
+| task_priorities → tasks | 1:N | - |
+| tasks → task_activities | 1:N (≥ 1, since "created" is always written) | - |
 
 ## Normalization
 

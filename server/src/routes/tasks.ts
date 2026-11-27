@@ -3,7 +3,6 @@ import { createTaskSchema, listTasksQuerySchema, updateTaskSchema } from '@mwe/s
 import { assertTaskId, parseOrThrow } from '../http/validate';
 import type { TaskService } from '../services/taskService';
 
-/** HTTP layer only: parse + validate input, call the service, shape the response. */
 export function tasksRouter(service: TaskService): Router {
   const r = Router();
 

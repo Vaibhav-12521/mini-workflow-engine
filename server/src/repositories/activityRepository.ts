@@ -41,13 +41,12 @@ export const activityRepository = {
     );
   },
 
-  /** Oldest → newest (documented assumption). `id` breaks ties for identical timestamps. */
   async listForTask(q: Queryable, taskId: string): Promise<Activity[]> {
     const { rows } = await q.query<ActivityRow>(
       `SELECT id, task_id, action, field, old_value, new_value, actor_id, created_at
        FROM task_activities
        WHERE task_id = $1
-       ORDER BY created_at ASC, id ASC`,
+       ORDER BY created_at ASC, seq ASC`,
       [taskId],
     );
     return rows.map(toActivity);

@@ -1,6 +1,3 @@
--- Synthetic seed data (no real people or data). Idempotent: fixed ids + ON CONFLICT DO NOTHING.
--- Run after migrate (lookup tables must exist). Timestamps are relative to now() so the UI looks fresh.
-
 INSERT INTO tasks (id, title, description, priority, status, version, created_at, updated_at) VALUES
   ('00000000-0000-4000-8000-000000000001', 'Set up CI pipeline for the API', 'Run lint, typecheck and tests on every pull request.', 'high', 'in_progress', 2, now() - interval '50 hours', now() - interval '48 hours'),
   ('00000000-0000-4000-8000-000000000002', 'Write onboarding guide for new volunteers', 'Cover tools access, code of conduct and first-week checklist.', 'medium', 'todo', 1, now() - interval '46 hours', now() - interval '46 hours'),
@@ -16,7 +13,6 @@ INSERT INTO tasks (id, title, description, priority, status, version, created_at
   ('00000000-0000-4000-8000-000000000012', 'Plan river clean-up drive logistics', 'Transport, gloves, bags and a sign-in sheet for 40 volunteers.', 'medium', 'todo', 1, now() - interval '2 hours', now() - interval '2 hours')
 ON CONFLICT (id) DO NOTHING;
 
--- History rows only for seed tasks that have none yet (keeps re-runs idempotent).
 INSERT INTO task_activities (task_id, action, field, old_value, new_value, created_at)
 SELECT v.task_id::uuid, v.action, v.field, v.old_value, v.new_value, v.created_at
 FROM (VALUES

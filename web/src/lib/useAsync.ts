@@ -6,10 +6,6 @@ export type AsyncState<T> =
   | { status: 'ready'; data: T }
   | { status: 'error'; error: ApiError; data?: T };
 
-/**
- * One reusable hook for every screen's loading / ready / error states.
- * Re-runs when `deps` change; ignores responses from out-of-date requests.
- */
 export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
   const [state, setState] = useState<AsyncState<T>>({ status: 'loading' });
   const requestId = useRef(0);
@@ -26,7 +22,6 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
           error: err instanceof ApiError ? err : new ApiError(0, 'INTERNAL', 'Unexpected error'),
         }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(run, [run]);

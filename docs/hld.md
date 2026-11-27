@@ -1,4 +1,4 @@
-# High-Level Design — Mini Workflow Engine
+# High-Level Design
 
 ## Context
 
@@ -32,8 +32,8 @@ flowchart LR
 | Task Service (`server/src/services`) | Business rules: transactions, optimistic locking, diffing fields into activity rows, 404/409 | Validated input | Task / Activity DTOs | Task Repository, Activity Repository |
 | Task Repository | SQL for tasks: insert, find (optionally `FOR UPDATE`), update, soft delete, list with filters | `Queryable`, typed args | Typed rows | Database |
 | Activity Repository | SQL for `task_activities`: insert, list by task | `Queryable`, typed args | Typed rows | Database |
-| Database | Storage, constraints (FK/CHECK), indexes, transactions, row locks | SQL | Rows | — |
-| Shared definition (`shared/`) | THE list of statuses/priorities, zod schemas, response types | — | Enums, schemas, types | Browser, Routes, Database (via migrate) |
+| Database | Storage, constraints (FK/CHECK), indexes, transactions, row locks | SQL | Rows | - |
+| Shared definition (`shared/`) | The list of statuses/priorities, zod schemas, response types | - | Enums, schemas, types | Browser, Routes, Database (via migrate) |
 
 ## Key flows
 
@@ -107,7 +107,7 @@ sequenceDiagram
 | Routes | HTTP concerns, input validation, status codes | SQL, business rules |
 | Service | Transactions, concurrency rule, activity diffing, 404/409 | HTTP or SQL text |
 | Repositories | SQL with parameters only | Business decisions, opening their own transactions |
-| External integrations | None in scope | — |
+| External integrations | None in scope | - |
 
 ## Tech choices
 
@@ -130,7 +130,7 @@ sequenceDiagram
 | Malformed JSON body | 400 `BAD_REQUEST` | Client bug; same error shape |
 | Concurrent edit (stale version) | 409 `CONFLICT` with current task | UI banner with **Reload** |
 | API unreachable | Client raises `NETWORK` error | Error state with **Try again** |
-| Unexpected exception | Logged server-side; 500 `INTERNAL`, no stack or SQL leaked | — |
+| Unexpected exception | Logged server-side; 500 `INTERNAL`, no stack or SQL leaked | - |
 
 ## Production gaps
 

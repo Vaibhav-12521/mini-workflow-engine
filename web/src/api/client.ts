@@ -9,7 +9,6 @@ import type {
   UpdateTaskInput,
 } from '@mwe/shared';
 
-/** Error thrown for any non-2xx response. Carries the server's standard error body. */
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -20,7 +19,6 @@ export class ApiError extends Error {
     super(message);
   }
 
-  /** Field-level messages from a 422, keyed by field name. */
   fieldErrors(): Record<string, string> {
     if (!Array.isArray(this.details)) return {};
     return Object.fromEntries(this.details.map((d) => [d.path, d.message]));

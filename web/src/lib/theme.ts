@@ -13,7 +13,6 @@ function read(): ThemeChoice {
   }
 }
 
-/** Theme switch: follows the OS by default; an explicit choice sets html[data-theme] (see tokens.css). */
 export function useTheme() {
   const [theme, setTheme] = useState<ThemeChoice>(read);
 
@@ -24,9 +23,7 @@ export function useTheme() {
     try {
       if (theme === 'system') localStorage.removeItem(KEY);
       else localStorage.setItem(KEY, theme);
-    } catch {
-      /* storage blocked: the choice simply isn't remembered */
-    }
+    } catch {}
   }, [theme]);
 
   const cycle = () => setTheme((t) => ORDER[(ORDER.indexOf(t) + 1) % ORDER.length]);

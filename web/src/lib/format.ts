@@ -9,7 +9,6 @@ const UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
   ['minute', 60],
 ];
 
-/** "2 hours ago", "yesterday", "just now". */
 export function timeAgo(iso: string, now = Date.now()): string {
   const seconds = Math.round((new Date(iso).getTime() - now) / 1000);
   for (const [unit, size] of UNITS) {
@@ -21,7 +20,6 @@ export function timeAgo(iso: string, now = Date.now()): string {
 export const fullDate = (iso: string) =>
   new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
 
-/** Human label for any stored value of a field (status / priority codes → labels). */
 export function fieldValueLabel(field: string | null, value: string | null): string {
   if (value === null || value === '') return '(empty)';
   if (field === 'status') return statusMeta(value)?.label ?? value;

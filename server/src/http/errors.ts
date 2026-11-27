@@ -1,9 +1,5 @@
 import type { ApiErrorBody, ErrorCode } from '@mwe/shared';
 
-/**
- * Every error the API returns goes through this class, so all responses share one shape:
- *   { "error": { "code": "...", "message": "...", "details": ... } }
- */
 export class AppError extends Error {
   constructor(
     public readonly status: number,

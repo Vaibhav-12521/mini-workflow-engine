@@ -1,4 +1,4 @@
-# API — Mini Workflow Engine
+# API
 
 Base URL: `http://localhost:4000/api` (in dev the UI calls `/api` through the Vite proxy).
 JSON in, JSON out. No auth (out of scope). Field names in responses are camelCase.
@@ -54,7 +54,7 @@ Allowed values come from `shared/src/domain.ts`: status `todo | in_progress | do
 
 | Field | Content |
 |---|---|
-| Request | Body: `{ title: string (1–200, trimmed, required), description?: string (≤ 5000, default ""), priority?: Priority (default "medium"), status?: Status (default "todo") }`. Unknown keys are rejected |
+| Request | Body: `{ title: string (1-200, trimmed, required), description?: string (≤ 5000, default ""), priority?: Priority (default "medium"), status?: Status (default "todo") }`. Unknown keys are rejected |
 | Response | `201` Task |
 | Errors | `422` invalid or missing fields · `400` bad JSON |
 | Idempotency | None (no idempotency key in scope) |
@@ -64,7 +64,7 @@ Allowed values come from `shared/src/domain.ts`: status `todo | in_progress | do
 
 | Field | Content |
 |---|---|
-| Request | Query: `status?`, `priority?`, `q?` (≤ 200 chars, matches title OR description, case-insensitive, `%`/`_` literal), `page?` (≥ 1, default 1), `pageSize?` (1–50, default 10), `sort?` (`updated_at` \| `created_at` \| `title` \| `priority` \| `status`, default `updated_at`), `order?` (`asc` \| `desc`, default `desc`). Empty values are ignored |
+| Request | Query: `status?`, `priority?`, `q?` (≤ 200 chars, matches title OR description, case-insensitive, `%`/`_` literal), `page?` (≥ 1, default 1), `pageSize?` (1-50, default 10), `sort?` (`updated_at` \| `created_at` \| `title` \| `priority` \| `status`, default `updated_at`), `order?` (`asc` \| `desc`, default `desc`). Empty values are ignored |
 | Response | `200` `{ data: Task[], pagination: { page, pageSize, total, totalPages } }` |
 | Errors | `422` unknown filter value, page < 1, pageSize > 50, unknown sort |
 | Notes | Filtering, search, sort and pagination run in SQL. Ties are broken by `id` for a stable order. `priority` sorts by rank (Low < Medium < High), `status` by workflow position. Soft-deleted tasks are never returned |
@@ -98,7 +98,7 @@ Allowed values come from `shared/src/domain.ts`: status `todo | in_progress | do
 
 | Field | Content |
 |---|---|
-| Response | `200` `{ data: Activity[] }`, ordered `createdAt ASC, id ASC` |
+| Response | `200` `{ data: Activity[] }`, oldest first (by `created_at`, then insert order) |
 | Errors | `404` unknown or deleted task |
 
 Activity object:

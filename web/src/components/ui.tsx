@@ -2,8 +2,6 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { PRIORITIES, STATUSES } from '@mwe/shared';
 import type { ApiError } from '../api/client';
 
-/* ---------- Button ---------- */
-
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
 export function Button({
@@ -26,8 +24,6 @@ export function Button({
   );
 }
 
-/* ---------- Select options from the shared definition (no hard-coded values in the UI) ---------- */
-
 export const StatusOptions = () => (
   <>
     {STATUSES.map((s) => (
@@ -47,8 +43,6 @@ export const PriorityOptions = () => (
     ))}
   </>
 );
-
-/* ---------- Page states: loading, empty, error, banner ---------- */
 
 export function Loading({ label = 'Loading…' }: { label?: string }) {
   return (

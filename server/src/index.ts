@@ -4,7 +4,7 @@ import { migrate } from './db/migrate';
 
 const port = Number(process.env.PORT ?? 4000);
 const db = await createDatabaseFromEnv();
-await migrate(db); // idempotent; keeps lookup tables in sync with the shared definition
+await migrate(db);
 
 const server = createApp(db).listen(port, () => {
   console.log(`API listening on http://localhost:${port}/api`);

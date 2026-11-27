@@ -10,7 +10,6 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import './styles/tokens.css';
 import './styles/app.css';
 
-/** "/" focuses search on the list, "N" opens the new-task form. Ignored while typing or with a dialog open. */
 function useShortcuts() {
   const navigate = useNavigate();
   useEffect(() => {

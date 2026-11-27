@@ -12,10 +12,6 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-/**
- * Destructive-action confirmation. Uses the native <dialog> element:
- * showModal() gives a real focus trap, Esc-to-close and an inert background for free.
- */
 export function ConfirmDialog({ open, title, children, confirmLabel, busy, error, onConfirm, onCancel }: ConfirmDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -32,7 +28,7 @@ export function ConfirmDialog({ open, title, children, confirmLabel, busy, error
       className="dialog"
       aria-labelledby="dialog-title"
       onCancel={(e) => {
-        e.preventDefault(); // Esc → let React state drive closing
+        e.preventDefault();
         if (!busy) onCancel();
       }}
     >

@@ -3,22 +3,12 @@ import pg from 'pg';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-/**
- * The tiny database interface the rest of the server depends on.
- * Repositories only ever see `Queryable`; services use `transaction()` to group writes.
- *
- * Two implementations, same SQL (both are real PostgreSQL):
- *  - PGlite: PostgreSQL compiled to WASM, runs in-process. Zero install → a clean clone just works.
- *  - pg Pool: used when DATABASE_URL is set, for a normal PostgreSQL server.
- */
 export interface Queryable {
   query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<{ rows: T[]; rowCount: number }>;
 }
 
 export interface Database extends Queryable {
-  /** Runs `fn` inside BEGIN … COMMIT. Any thrown error triggers ROLLBACK and is re-thrown. */
   transaction<T>(fn: (tx: Queryable) => Promise<T>): Promise<T>;
-  /** Runs a multi-statement SQL script (migrations, seed). */
   exec(sql: string): Promise<void>;
   close(): Promise<void>;
 }
@@ -71,9 +61,7 @@ function fromPgPool(pool: pg.Pool): Database {
 }
 
 export interface DbOptions {
-  /** postgres:// URL → real server. Otherwise PGlite. */
   url?: string;
-  /** PGlite data directory. Omit for an in-memory database (tests). */
   dataDir?: string;
 }
 
@@ -85,7 +73,6 @@ export async function createDatabase(opts: DbOptions = {}): Promise<Database> {
   return fromPglite(db);
 }
 
-/** Database used by the running app and the CLI scripts, configured from env. */
 export function createDatabaseFromEnv(): Promise<Database> {
   return createDatabase({
     url: process.env.DATABASE_URL || undefined,

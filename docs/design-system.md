@@ -1,4 +1,4 @@
-# Design System — Mini Workflow Engine
+# Design System
 
 Built on the shared tokens from the assignment repo (`shared/design-system/tokens.css`), copied to `web/src/styles/tokens.css` and extended at the bottom of that file. Components use only `var(--…)` tokens, with no hard-coded colours or sizes. The one exception is the dialog backdrop's translucent overlay.
 
@@ -40,27 +40,27 @@ Theme follows the OS (`prefers-color-scheme`) by default. The switch in the rail
 | Name | Purpose | Variants | States | Props |
 |---|---|---|---|---|
 | `Button` (`ui.tsx`) | All actions | primary, secondary, danger, ghost, icon | default, hover, focus, disabled, loading (spinner + `aria-busy`) | `variant`, `loading`, native button props |
-| `StatusChip` / `PriorityChip` (`Chip.tsx`) | Show a status or priority | tone from definition: neutral, info, success, warning, danger | — | `value` |
+| `StatusChip` / `PriorityChip` (`Chip.tsx`) | Show a status or priority | tone from definition: neutral, info, success, warning, danger | - | `value` |
 | `TaskForm` | **The** create and edit form, with a live preview panel | `mode: create \| edit` (status field only in edit) | default, validation error (inline, `aria-invalid`, `aria-describedby`), saving, server error / conflict banner | `mode`, `initial`, `onSubmit`, `onCancel` |
-| `Sidebar` / `TopBar` (`Shell.tsx`) | App navigation, live workflow counts, theme switch | rail at 1024px and up, top bar below | active item, loading counts (`·`) | — |
-| Status tabs (list page) | All + one tab per status with its count; click to filter | one per status + All | selected (`aria-pressed`, underline), hover | — |
+| `Sidebar` / `TopBar` (`Shell.tsx`) | App navigation, live workflow counts, theme switch | rail at 1024px and up, top bar below | active item, loading counts (`·`) | - |
+| Status tabs (list page) | All + one tab per status with its count; click to filter | one per status + All | selected (`aria-pressed`, underline), hover | - |
 | `StatusTrack` | Status control on the detail page: one stop per status, in workflow order | passed, current, ahead (tone from definition) | hover, focus, disabled while saving; `aria-pressed` on the current stop | `value`, `onSelect`, `disabled` |
-| `MiniTrack` | Read-only progress dashes under the status chip in list rows | — | — | `value` |
-| `FilterBar` | Search, status, priority, sort, clear in one row | — | Clear disabled when no filter; search debounced 300 ms | `filters`, `onChange`, `onClear` |
-| `Pagination` | Prev/Next + "Page x of y · n tasks" | — | buttons disabled at ends | `page`, `totalPages`, `total`, `onPage` |
+| `MiniTrack` | Read-only progress dashes under the status chip in list rows | - | - | `value` |
+| `FilterBar` | Search, status, priority, sort, clear in one row | - | Clear disabled when no filter; search debounced 300 ms | `filters`, `onChange`, `onClear` |
+| `Pagination` | Prev/Next + "Page x of y · n tasks" | - | buttons disabled at ends | `page`, `totalPages`, `total`, `onPage` |
 | `ActivityTimeline` | History, oldest first | item per action: created, edited, status_changed, deleted | empty ("No activity yet") | `items` |
 | `ConfirmDialog` | Destructive confirmation | destructive | default, deleting (loading), error | `open`, `title`, `confirmLabel`, `busy`, `error`, `onConfirm`, `onCancel` |
-| `Loading`, `SkeletonRows`, `EmptyState`, `ErrorState`, `Banner` | Page states | banner: success, error, info | error has **Try again**; banner dismissible; `role=status` / `role=alert` | — |
+| `Loading`, `SkeletonRows`, `EmptyState`, `ErrorState`, `Banner` | Page states | banner: success, error, info | error has **Try again**; banner dismissible; `role=status` / `role=alert` | - |
 
 ## States per screen
 
 | Screen | Loading | Empty | Error | Success |
 |---|---|---|---|---|
 | S-01 List | Skeleton rows; dimmed table while refreshing | "No tasks yet" + New task, or "No tasks match these filters" + Clear | Error card + Try again | "Task … deleted" banner |
-| S-02 Form | "Saving…" button spinner | — | Inline field errors; banner for server or conflict errors | Navigates to detail with "Task created" / "Changes saved" |
+| S-02 Form | "Saving…" button spinner | - | Inline field errors; banner for server or conflict errors | Navigates to detail with "Task created" / "Changes saved" |
 | S-03 Detail | Spinner; workflow track disabled with "Saving…" while saving | "No activity yet" | Error card; conflict banner with Reload | "Status updated to Done" banner; chip updates immediately |
-| S-04 Dialog | "Deleting…" | — | Error banner inside dialog | Returns to list with banner |
-| S-05 Not found | — | — | Message + Back to list | — |
+| S-04 Dialog | "Deleting…" | - | Error banner inside dialog | Returns to list with banner |
+| S-05 Not found | - | - | Message + Back to list | - |
 
 ## Layout
 
@@ -96,7 +96,7 @@ Visual style: flat cards, small corner radii, thin borders, one accent colour (t
 | Screen | Desktop | Mobile / dark |
 |---|---|---|
 | Task list | [01](demo/01-task-list.png), [02 filtered](demo/02-filtered-list.png), [03 empty](demo/03-empty-filtered.png) | [13 mobile](demo/13-list-mobile.png), [14 dark](demo/14-list-dark.png), [16 tablet](demo/16-list-tablet.png) |
-| Task form | [04 validation](demo/04-form-validation.png), [07 edit](demo/07-edit-form.png) | — |
+| Task form | [04 validation](demo/04-form-validation.png), [07 edit](demo/07-edit-form.png) | - |
 | Task detail | [05](demo/05-detail-created.png), [06 status](demo/06-status-changed.png), [08 history](demo/08-detail-history.png), [17 1920px](demo/17-detail-wide.png) | [12 dark](demo/12-detail-dark.png), [15 mobile](demo/15-detail-mobile.png) |
-| Delete confirm | [09](demo/09-delete-confirm.png) | — |
-| Not found | [11](demo/11-not-found.png) | — |
+| Delete confirm | [09](demo/09-delete-confirm.png) | - |
+| Not found | [11](demo/11-not-found.png) | - |

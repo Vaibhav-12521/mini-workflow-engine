@@ -1,4 +1,4 @@
-# Testing — Mini Workflow Engine
+# Testing
 
 **Run everything:** `npm test` (Vitest + Supertest; about 7 s).
 Each test file spins up a fresh **in-memory PostgreSQL** (PGlite) with the real `db/schema.sql`, then calls the real Express app over HTTP. There are no mocks of the database, so constraints, foreign keys, triggers and `FOR UPDATE` all behave as in production.
@@ -27,7 +27,7 @@ Result at submission: **27 passed** (3 files). `tsc` passes for shared, server a
 | T18 | Filters (US-06) | integration | `?status`, `?priority`, both | Correct rows only | `server/tests/list.test.ts` |
 | T19 | Search + filters (US-07) | integration | `?q=BUG`, `?q=bug&priority=high&status=todo` | Case-insensitive match on title OR description, combined with filters | same |
 | T20 | Literal wildcard search | integration | `?q=50%`, `?q=%` | Only the task containing "50%" | same |
-| T21 | Pagination | integration | `pageSize=2` pages 1–3 | total 5, totalPages 3, no overlap | same |
+| T21 | Pagination | integration | `pageSize=2` pages 1-3 | total 5, totalPages 3, no overlap | same |
 | T22 | Sort by priority rank | integration | `sort=priority&order=asc` | low, medium, medium, high, high | same |
 | T23 | Bad query params | integration | unknown status, pageSize 500, sort=password, page 0 | 422 each | same |
 | T24 | Empty filters ignored | integration | `status=&priority=&q=` | All 5 tasks | same |
@@ -41,12 +41,12 @@ As a check on the tests themselves, I temporarily replaced `db.transaction(...)`
 
 | Scenario (brief section D) | Handled | Tested |
 |---|---|---|
-| Update of a non-existent task | ✅ 404 | T09 |
-| Task update + activity commit together | ✅ one transaction | T15–T17 |
-| Filtering/sorting/pagination in the DB | ✅ SQL | T18–T24 |
-| Status/priority validation | ✅ zod + FK, one definition | T03, T07, T13, T14, T23 |
-| Two near-simultaneous updates | ✅ `FOR UPDATE` + version → 409 | T11, T12 |
-| Which operations need transactions / failure tests | ✅ create, update, delete | T15–T17 |
+| Update of a non-existent task | Yes, 404 | T09 |
+| Task update + activity commit together | Yes, one transaction | T15-T17 |
+| Filtering/sorting/pagination in the DB | Yes, SQL | T18-T24 |
+| Status/priority validation | Yes, zod + FK, one definition | T03, T07, T13, T14, T23 |
+| Two near-simultaneous updates | Yes, `FOR UPDATE` + version → 409 | T11, T12 |
+| Which operations need transactions / failure tests | Yes, create, update, delete | T15-T17 |
 
 ## Not tested (and why)
 

@@ -2,11 +2,6 @@ import { STATUSES, statusMeta, type TaskStatus } from '@mwe/shared';
 
 const indexOf = (value: string) => STATUSES.findIndex((s) => s.value === value);
 
-/**
- * The workflow drawn as a track, one stop per status in the shared definition.
- * Stops before the current one show as passed. Any status can be picked (the brief allows any transition).
- * Adding a status to shared/src/domain.ts adds a stop here with no UI change.
- */
 export function StatusTrack({
   value,
   onSelect,
@@ -41,7 +36,6 @@ export function StatusTrack({
   );
 }
 
-/** Compact, read-only progress dots for list rows. */
 export function MiniTrack({ value }: { value: string }) {
   const current = indexOf(value);
   const label = statusMeta(value)?.label ?? value;

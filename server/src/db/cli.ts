@@ -11,7 +11,7 @@ try {
   } else if (command === 'seed') {
     await migrate(db);
     if (process.env.SEED_ENABLED === 'false') {
-      console.log('SEED_ENABLED=false — skipping seed');
+      console.log('SEED_ENABLED=false, skipping seed');
     } else {
       await seed(db);
       console.log('✔ synthetic seed data loaded (idempotent)');

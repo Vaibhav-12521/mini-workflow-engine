@@ -20,10 +20,6 @@ interface TaskFormProps {
 
 type Errors = Partial<Record<keyof TaskFormValues, string>>;
 
-/**
- * THE one form for both create and edit (no duplicated form logic).
- * Validation uses the same zod schema as the API, so the rules can never drift apart.
- */
 export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
   const [values, setValues] = useState<TaskFormValues>({
     title: initial?.title ?? '',
@@ -44,7 +40,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
   const set = <K extends keyof TaskFormValues>(key: K, value: TaskFormValues[K]) => {
     const next = { ...values, [key]: value };
     setValues(next);
-    if (errors[key]) setErrors((e) => ({ ...e, [key]: validate(next)[key] })); // re-check a field once it showed an error
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: validate(next)[key] }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -61,7 +57,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
       await onSubmit(taskFormSchema.parse(values));
     } catch (err) {
       const apiErr = err instanceof ApiError ? err : new ApiError(0, 'INTERNAL', 'Could not save the task');
-      setErrors(apiErr.fieldErrors()); // server-side 422 messages land on the right field
+      setErrors(apiErr.fieldErrors());
       setFormError(apiErr);
     } finally {
       setSaving(false);
@@ -128,7 +124,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
           {fieldError('priority')}
         </div>
 
-        {/* New tasks always start in the default status (brief assumption); status is editable afterwards. */}
+        {}
         {mode === 'edit' && (
           <div className="field">
             <label htmlFor="field-status">Status</label>
@@ -150,7 +146,7 @@ export function TaskForm({ mode, initial, onSubmit, onCancel }: TaskFormProps) {
       </div>
     </form>
 
-    {/* Live preview: how the task will read in the list, from the same values the form submits. */}
+    {}
     <aside className="form-aside" aria-label="Preview">
       <div className="card preview">
         <h2 className="preview__heading">Preview</h2>

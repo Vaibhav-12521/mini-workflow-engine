@@ -23,7 +23,7 @@ afterAll(() => db.close());
 
 const titles = (body: { data: Array<{ title: string }> }) => body.data.map((t) => t.title);
 
-describe('List, filter, search, paginate, sort — all in SQL (US-06, US-07)', () => {
+describe('List, filter, search, paginate, sort, all in SQL (US-06, US-07)', () => {
   it('T18 filters by status and by priority, and combines them', async () => {
     expect(titles((await api.get('/api/tasks?status=todo')).body).sort()).toEqual(['Discount 50% banner', 'Fix login bug']);
     expect(titles((await api.get('/api/tasks?priority=high')).body).sort()).toEqual(['Deploy hotfix', 'Fix login bug']);

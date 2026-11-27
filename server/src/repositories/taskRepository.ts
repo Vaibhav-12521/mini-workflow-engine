@@ -1,8 +1,6 @@
 import type { ListTasksQuery, SortField, Task, TaskPriority, TaskStatus } from '@mwe/shared';
 import type { Queryable } from '../db/client';
 
-/** Data access only: SQL in, typed rows out. No business rules here. */
-
 interface TaskRow {
   id: string;
   title: string;
@@ -29,10 +27,6 @@ export const toTask = (r: TaskRow): Task => ({
   updatedAt: toIso(r.updated_at),
 });
 
-/**
- * Whitelisted ORDER BY expressions. The client picks a key; it never sends SQL.
- * priority/status sort by their lookup rank/position (Low < Medium < High), not alphabetically.
- */
 const SORT_SQL: Record<SortField, string> = {
   updated_at: 't.updated_at',
   created_at: 't.created_at',
@@ -41,7 +35,6 @@ const SORT_SQL: Record<SortField, string> = {
   status: 's.position',
 };
 
-/** Escape LIKE wildcards so searching for "50%" matches the literal text. */
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 export interface NewTask {
@@ -64,7 +57,6 @@ export const taskRepository = {
     return toTask(rows[0]);
   },
 
-  /** Live (not soft-deleted) task. `forUpdate` locks the row until the transaction ends. */
   async findById(q: Queryable, id: string, opts: { forUpdate?: boolean } = {}): Promise<Task | null> {
     const { rows } = await q.query<TaskRow>(
       `SELECT ${COLUMNS} FROM tasks t
@@ -75,10 +67,8 @@ export const taskRepository = {
     return rows[0] ? toTask(rows[0]) : null;
   },
 
-  /** Applies the changes, bumps version and updated_at. Only columns in `changes` are touched. */
   async update(q: Queryable, id: string, changes: TaskChanges): Promise<Task> {
     const entries = Object.entries(changes).filter(([, v]) => v !== undefined);
-    // Column names come from the typed TaskChanges keys, values are always parameters.
     const sets = entries.map(([col], i) => `${col} = $${i + 2}`);
     const { rows } = await q.query<TaskRow>(
       `UPDATE tasks AS t
@@ -98,7 +88,6 @@ export const taskRepository = {
     );
   },
 
-  /** Filtering, search, sorting and pagination all happen in SQL. */
   async list(q: Queryable, f: ListTasksQuery): Promise<{ rows: Task[]; total: number }> {
     const where: string[] = ['t.deleted_at IS NULL'];
     const params: unknown[] = [];

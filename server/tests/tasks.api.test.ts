@@ -66,7 +66,6 @@ describe('Update and status change (US-02, US-03)', () => {
     expect(new Date(res.body.updatedAt).getTime()).toBeGreaterThan(new Date(res.body.createdAt).getTime());
 
     const { body } = await api.get(`/api/tasks/${task.id}/activities`);
-    // description was unchanged ('' → '') so it is NOT logged.
     expect(body.data.map((a: { action: string; field: string; oldValue: string; newValue: string }) =>
       [a.action, a.field, a.oldValue, a.newValue])).toEqual([
       ['created', null, null, 'Old title'],

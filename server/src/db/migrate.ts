@@ -5,11 +5,6 @@ import type { Database } from './client';
 
 const sqlPath = (name: string) => fileURLToPath(new URL(`../../../db/${name}`, import.meta.url));
 
-/**
- * 1. Apply db/schema.sql (idempotent).
- * 2. Sync the lookup tables from the ONE shared definition (shared/src/domain.ts).
- *    Adding "blocked" to STATUSES and re-running migrate is all the database needs.
- */
 export async function migrate(db: Database): Promise<void> {
   await db.exec(await readFile(sqlPath('schema.sql'), 'utf8'));
 
@@ -28,8 +23,6 @@ export async function migrate(db: Database): Promise<void> {
         [p.value, p.label, rank],
       );
     }
-    // Remove values that were dropped from the definition — only if no task still uses them
-    // (FK ON DELETE RESTRICT would otherwise fail, which is the safe outcome).
     await tx.query(
       `DELETE FROM task_statuses s WHERE NOT (s.code = ANY($1::text[]))
          AND NOT EXISTS (SELECT 1 FROM tasks t WHERE t.status = s.code)`,

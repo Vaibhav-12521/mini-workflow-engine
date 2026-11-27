@@ -13,7 +13,6 @@ import { useAsync } from '../lib/useAsync';
 import { useFlash } from '../lib/useFlash';
 import { NotFoundPage } from './NotFoundPage';
 
-/** S-03 Task detail: fields on top, status control, Edit / Delete, activity timeline below. */
 export function TaskDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ export function TaskDetailPage() {
     clearFlash();
     try {
       const updated = await tasksApi.update(t.id, { status: next, version: t.version });
-      task.setData(updated); // show the new status right after success
+      task.setData(updated);
       history.reload();
       pipeline.refresh();
       setStatusMsg({ tone: 'success', text: `Status updated to ${statusMeta(next)?.label ?? next}` });

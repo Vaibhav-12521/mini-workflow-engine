@@ -12,7 +12,6 @@ import { conflict, notFound } from '../http/errors';
 import { activityRepository } from '../repositories/activityRepository';
 import { taskRepository, type TaskChanges } from '../repositories/taskRepository';
 
-/** Validated input the service receives (routes have already run the zod schemas). */
 export interface CreateTask {
   title: string;
   description: string;
@@ -25,12 +24,6 @@ export interface UpdateTask extends Partial<Pick<Task, 'title' | 'description' |
 
 const FIELDS: EditableField[] = ['title', 'description', 'priority', 'status'];
 
-/**
- * Business rules live here:
- *  - every write and its activity row(s) share ONE transaction (all or nothing)
- *  - optimistic concurrency via `version` (stale write → 409, never a silent overwrite)
- *  - an edit records one activity row per field that actually changed, with old and new values
- */
 export function createTaskService(db: Database) {
   return {
     async create(input: CreateTask): Promise<Task> {
@@ -54,8 +47,6 @@ export function createTaskService(db: Database) {
 
     async update(id: string, input: UpdateTask): Promise<Task> {
       return db.transaction(async (tx) => {
-        // Lock the row: a second concurrent update waits here until we commit,
-        // then sees the new version and gets a 409 instead of overwriting our change.
         const current = await taskRepository.findById(tx, id, { forUpdate: true });
         if (!current) throw notFound();
         if (current.version !== input.version) {
@@ -71,7 +62,7 @@ export function createTaskService(db: Database) {
           const next = input[f];
           if (next !== undefined && next !== current[f]) (changes as Record<string, string>)[f] = next;
         }
-        if (Object.keys(changes).length === 0) return current; // no-op: no write, no history noise
+        if (Object.keys(changes).length === 0) return current;
 
         const updated = await taskRepository.update(tx, id, changes);
         for (const f of Object.keys(changes) as EditableField[]) {

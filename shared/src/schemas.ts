@@ -15,8 +15,6 @@ import {
   type TaskStatus,
 } from './domain';
 
-/* ---------- Request schemas (used by the API AND by the web form for inline validation) ---------- */
-
 export const statusSchema = z.enum(STATUS_VALUES, {
   error: () => `Status must be one of: ${STATUS_VALUES.join(', ')}`,
 });
@@ -43,10 +41,6 @@ export const createTaskSchema = z.strictObject({
 });
 export type CreateTaskInput = z.input<typeof createTaskSchema>;
 
-/**
- * PATCH body. `version` is required: it is the optimistic-concurrency token the client read.
- * If someone else changed the task in the meantime, the API answers 409 instead of silently overwriting.
- */
 export const updateTaskSchema = z
   .strictObject({
     title: titleSchema.optional(),
@@ -60,7 +54,6 @@ export const updateTaskSchema = z
   });
 export type UpdateTaskInput = z.input<typeof updateTaskSchema>;
 
-/** Form-level schema shared by the create/edit form (status optional on create). */
 export const taskFormSchema = z.object({
   title: titleSchema,
   description: descriptionSchema,
@@ -69,7 +62,6 @@ export const taskFormSchema = z.object({
 });
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
 
-/** Query-string schema for GET /tasks. Strings are coerced; empty values mean "no filter". */
 const emptyToUndefined = (v: unknown) => (v === '' || v === null ? undefined : v);
 
 export const listTasksQuerySchema = z.object({
@@ -85,8 +77,6 @@ export const listTasksQuerySchema = z.object({
   order: z.preprocess(emptyToUndefined, z.enum(['asc', 'desc']).default(DEFAULT_ORDER)),
 });
 export type ListTasksQuery = z.infer<typeof listTasksQuerySchema>;
-
-/* ---------- Response types ---------- */
 
 export interface Task {
   id: string;

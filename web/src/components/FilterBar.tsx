@@ -24,9 +24,7 @@ interface FilterBarProps {
   onClear: () => void;
 }
 
-/** Status, priority, search and sort in one row, plus Clear filters. Values come from the shared definition. */
 export function FilterBar({ filters, onChange, onClear }: FilterBarProps) {
-  // Search is debounced so we query the API once the user pauses typing, not on every key.
   const [q, setQ] = useState(filters.q);
   useEffect(() => setQ(filters.q), [filters.q]);
   useEffect(() => {

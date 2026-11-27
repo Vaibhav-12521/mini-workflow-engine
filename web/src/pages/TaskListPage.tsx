@@ -12,7 +12,6 @@ import { useAsync } from '../lib/useAsync';
 import { useFlash } from '../lib/useFlash';
 import { usePipeline } from '../lib/pipeline';
 
-/** S-01 Task list. Filters live in the URL, so a filtered view survives refresh and can be shared. */
 export function TaskListPage() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -43,7 +42,7 @@ export function TaskListPage() {
             if (v === '' || v === undefined) next.delete(k);
             else next.set(k, String(v));
           }
-          if (!('page' in patch)) next.delete('page'); // any filter change → back to page 1
+          if (!('page' in patch)) next.delete('page');
           return next;
         },
         { replace: true },
@@ -70,7 +69,7 @@ export function TaskListPage() {
         </Link>
       </header>
 
-      {/* Status tabs come from the shared definition; a new status adds a tab. Same ?status= filter as the dropdown. */}
+      {}
       <div className="tabs" role="group" aria-label="Filter by status">
         <button type="button" className="tabs__item" aria-pressed={!filters.status} onClick={() => update({ status: '' })}>
           All <span className="tabs__count">{counts?.total ?? ''}</span>

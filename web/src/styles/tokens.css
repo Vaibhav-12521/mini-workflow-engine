@@ -1,7 +1,3 @@
-/* FullStack Assignment — shared design tokens v1.0 (2026-11-06)
-   Use these as the starting point. Extend per assignment; do not hard-code values in components.
-   Change for Assignment 03: the dark block is keyed to the OS setting AND to an explicit
-   theme choice (html[data-theme]), so the in-app theme switch can override the OS. */
 :root {
   --color-bg: #ffffff;
   --color-surface: #eef3f7;
@@ -30,7 +26,6 @@
   :root { --motion-fast: 0ms; --motion-base: 0ms; }
 }
 
-/* ---- Extensions for Assignment 03 (documented in docs/design-system.md) ---- */
 :root {
   color-scheme: light;
 
@@ -46,7 +41,6 @@
   --shadow-2: 0 8px 28px rgba(20, 38, 63, 0.18);
   --backdrop: rgba(10, 20, 35, 0.55);
 
-  /* Sidebar: the navy + teal pairing of the shared palette */
   --color-rail-bg: #14263f;
   --color-rail-text: #e8eef6;
   --color-rail-muted: #9fb0c4;
@@ -55,7 +49,6 @@
   --color-rail-accent: #2dc4b2;
 }
 
-/* Dark values: OS dark (unless the user picked light), or an explicit dark choice. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;

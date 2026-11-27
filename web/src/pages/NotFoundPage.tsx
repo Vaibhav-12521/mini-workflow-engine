@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 
-/** S-05 Not found: unknown task id or unknown route. */
 export function NotFoundPage({ what = 'task' }: { what?: string }) {
   return (
     <div className="not-found">

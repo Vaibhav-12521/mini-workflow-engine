@@ -5,7 +5,6 @@ import { ErrorState, Loading } from '../components/ui';
 import { useAsync } from '../lib/useAsync';
 import { NotFoundPage } from './NotFoundPage';
 
-/** S-02 (create). Uses the shared TaskForm. */
 export function TaskCreatePage() {
   const navigate = useNavigate();
   return (
@@ -28,7 +27,6 @@ export function TaskCreatePage() {
   );
 }
 
-/** S-02 (edit). Same TaskForm; sends the version it loaded so concurrent edits are detected. */
 export function TaskEditPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();

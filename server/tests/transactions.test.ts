@@ -2,12 +2,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { Database } from '../src/db/client';
 import { createTask, setupTestApp, truncate } from './helpers';
 
-/**
- * US-10: "If the activity write fails, the task change is rolled back too."
- * We force a real failure inside PostgreSQL: a trigger that raises on every INSERT into
- * task_activities. The task write happens first in the same transaction, so if the code were
- * doing two unrelated writes, the task change would survive. It must not.
- */
 let db: Database;
 let api: Awaited<ReturnType<typeof setupTestApp>>['api'];
 
@@ -36,7 +30,7 @@ describe('Transaction rollback (US-10 / F-13)', () => {
 
     expect(res.status).toBe(500);
     expect(res.body.error).toMatchObject({ code: 'INTERNAL' });
-    expect(JSON.stringify(res.body)).not.toMatch(/simulated|exception|sql/i); // no raw DB error leaked
+    expect(JSON.stringify(res.body)).not.toMatch(/simulated|exception|sql/i);
     const { rows } = await db.query('SELECT 1 FROM tasks');
     expect(rows).toHaveLength(0);
   });

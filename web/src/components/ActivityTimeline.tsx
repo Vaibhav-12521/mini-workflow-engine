@@ -24,7 +24,6 @@ function describe(a: Activity) {
   );
 }
 
-/** History in time order, oldest first (documented assumption). */
 export function ActivityTimeline({ items }: { items: Activity[] }) {
   if (items.length === 0) return <p className="muted">No activity yet.</p>;
   return (
