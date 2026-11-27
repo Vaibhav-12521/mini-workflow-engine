@@ -6,26 +6,43 @@ Assignment 03 of the Anshumat / OnRole full-stack screen. TypeScript end to end,
 
 ![Task list](docs/demo/01-task-list.png)
 
+- Repository: https://github.com/Vaibhav-12521/mini-workflow-engine
+- Demo video: see [docs/demo/README.md](docs/demo/README.md)
+- Screenshots of every screen (light, dark, tablet, mobile): [docs/demo/](docs/demo/README.md)
+
+## My approach
+
+1. Read the brief, rubric and submission guide first, and turned the six depth-check questions into design rules before writing code.
+2. Defined statuses and priorities in one place (`shared/src/domain.ts`). API validation, UI dropdowns and the database lookup tables all come from it, so a new status is a one-line change.
+3. Built the backend in layers (routes, service, repositories). Every write and its history rows go through one transaction.
+4. Wrote tests for the risky parts first: rollback, 404s, validation, two parallel updates, and filtering in SQL.
+5. Built the React UI with one shared form and a clear loading, empty, error and success state on every screen, then checked it on desktop, tablet, mobile and in dark mode.
+6. Wrote the docs the submission guide asks for and listed assumptions, trade-offs and limits below.
+
 ## Quick start
 
 You need Node.js 20+ and npm. No Docker and no database install (see the Database section below).
 
 ```bash
-git clone <this repo> && cd mini-workflow-engine
-npm install            # installs all three workspaces (shared, server, web)
-cp .env.example .env   # optional; defaults work without it
-npm run db:seed        # creates the schema and loads 12 synthetic tasks (safe to re-run)
-npm run dev            # API on http://localhost:4000/api, UI on http://localhost:5173
-npm test               # 27 API/DB tests against a fresh in-memory PostgreSQL
+git clone https://github.com/Vaibhav-12521/mini-workflow-engine.git
+cd mini-workflow-engine
+npm install
+npm run db:seed
+npm run dev
+npm test
 ```
+
+Open http://localhost:5173 for the UI. The API runs on http://localhost:4000/api. Copying `.env.example` to `.env` is optional, the defaults work without it.
 
 | Command | What it does |
 |---|---|
+| `npm install` | Installs all three workspaces (shared, server, web) |
 | `npm run dev` | Starts the API (tsx watch) and the Vite UI together |
 | `npm run db:migrate` | Applies `db/schema.sql` and syncs status/priority lookup tables from the shared definition |
-| `npm run db:seed` | Migrate + `db/seed.sql` (idempotent; skipped when `SEED_ENABLED=false`) |
+| `npm run db:seed` | Migrate + `db/seed.sql`, loads 12 synthetic tasks (safe to re-run; skipped when `SEED_ENABLED=false`) |
 | `npm run db:reset` | Drops all tables, migrates, re-seeds. Stop `npm run dev` first (the embedded DB is single-process) |
-| `npm test` | Runs every test (Vitest + Supertest) |
+| `npm test` | Runs all 27 tests (Vitest + Supertest) against a fresh in-memory PostgreSQL |
+| `npm run build` | Production build of the UI |
 | `npm run typecheck` | `tsc` over shared, server and web |
 
 If port 5173 is busy, Vite picks the next free port and prints it.
@@ -51,11 +68,21 @@ server/src/
   http/errors.ts          ← one error class → one error shape
 server/tests/             ← 27 tests (API, transactions/rollback, list/filter/search)
 web/src/
-  components/             ← TaskForm (create + edit), Chip, FilterBar, ConfirmDialog, ActivityTimeline, ui.tsx
+  components/             ← TaskForm (create + edit), Shell (sidebar, top bar), StatusTrack, Chip,
+                            FilterBar, Pagination, ConfirmDialog, ActivityTimeline, ui.tsx
   pages/                  ← List, Create/Edit, Detail, NotFound
-  api/client.ts, lib/     ← typed fetch client, useAsync (loading/ready/error), formatting
+  api/client.ts           ← typed fetch client
+  lib/                    ← useAsync (loading/ready/error), status counts, theme, formatting
 docs/                     ← HLD, database, API, design system, testing, sitemap, demo screenshots
 ```
+
+## What the UI does
+
+- Task list with status tabs (with counts), search, status and priority filters, sort and pagination. Filters live in the URL, so a filtered view survives a refresh.
+- Create and edit with the same form, inline validation from the same zod schema as the API, and a small preview of how the task will look in the list.
+- Task page with a status control (one button per status, in workflow order), Edit, Delete with a confirmation dialog, and the full history with old and new values.
+- Clear messages for every case: loading, empty, no results, saved, validation errors, "someone else changed this task, reload", and not found.
+- Works from 390px phones to wide screens. Light and dark theme (follows the system, or pick one). Keyboard friendly, with `/` to search and `N` for a new task.
 
 ## Architecture, data model, API
 
@@ -75,7 +102,7 @@ docs/                     ← HLD, database, API, design system, testing, sitema
 | Page size | 10 by default, max 50 (`?pageSize=`). Offset pagination with `total` and `totalPages` |
 | Default sort | `updated_at DESC`, tie-break on `id`. Also sortable by `created_at`, `title`, `priority` (by rank Low < Medium < High) and `status` (workflow order) |
 | Search fields | Title or description, case-insensitive substring (`ILIKE`). `%` and `_` are matched literally |
-| Activity order | Oldest → newest |
+| Activity order | Oldest to newest. Rows from the same edit keep their insert order (`seq` column) |
 | Error shape | `{ "error": { "code", "message", "details" } }` for every 4xx/5xx |
 | Concurrent update rule | Optimistic locking: PATCH must send the `version` it read. Stale version → `409 CONFLICT` |
 | Delete | Soft delete (`deleted_at`). The task disappears from the API (404), its history stays in the DB |
@@ -156,6 +183,11 @@ The 500 body is the generic error shape. It contains no SQL or trigger text.
 - An "Include deleted" view with restore.
 - Status transition rules (e.g. Done → Todo not allowed) as a small state machine in the shared definition.
 - Playwright e2e tests for the UI states.
+
+## Things I fixed along the way
+
+- History order: when one edit changed two fields, both history rows could get the same timestamp and then come back in random order (one test failed now and then). I added an identity `seq` column to `task_activities` and the timeline now orders by `created_at, seq`. Existing databases get the column on the next `npm run db:migrate`.
+- Contrast: the Delete button label was too faint in dark mode, so I added a separate token for text on danger buttons.
 
 ## Live follow-up: adding a Blocked status
 
